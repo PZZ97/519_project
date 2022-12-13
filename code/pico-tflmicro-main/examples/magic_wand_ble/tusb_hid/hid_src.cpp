@@ -130,11 +130,12 @@ static void send_hid_report(uint8_t report_id, uint32_t btn, int8_t cursor_x, in
         }
         else
           keycode[0] =HID_KEY_1+ key-'1';
+
         tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, keycode);
         has_keyboard_key = true;
-        tud_task();
-        keycode[0] =0;
-        tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, keycode);
+        // tud_task();
+        // keycode[0] =0;
+        // tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, keycode);
       }else
       {
         // send empty key report if previously has key pressed

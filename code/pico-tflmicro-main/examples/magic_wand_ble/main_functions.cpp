@@ -197,7 +197,7 @@ void mpu6050_read_raw(uint8_t addr, int16_t accel[3], int16_t gyro[3]) { // add 
     // *temp = buffer[0] << 8 | buffer[1];
 }
 // #endif
-void mpu6050_read_data(uint8_t addr, float _accel[3], float _gyro[3]) { // add int16_t *temp for temperature if needs
+bool mpu6050_read_data(uint8_t addr, float _accel[3], float _gyro[3]) { // add int16_t *temp for temperature if needs
     // For this particular device, we send the device the register we want to read
     // first, then subsequently read from the device. The register is auto incrementing
     // so we don't need to keep sending the register we want, just the first.
@@ -213,6 +213,7 @@ void mpu6050_read_data(uint8_t addr, float _accel[3], float _gyro[3]) { // add i
     int16_t accel[3];
     for (int i = 0; i < 1; i++) {
         accel[i] = (buffer[i * 2] << 8 | buffer[(i * 2) + 1]);
+        // if()
         _accel[i]=(float)_accel[i]*4.0 / 32768.0;
     }
 
