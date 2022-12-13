@@ -16,7 +16,7 @@ limitations under the License.
 #ifndef TENSORFLOW_LITE_MICRO_EXAMPLES_MAGIC_WAND_MAIN_FUNCTIONS_H_
 #define TENSORFLOW_LITE_MICRO_EXAMPLES_MAGIC_WAND_MAIN_FUNCTIONS_H_
 #include "pico/stdlib.h"
-
+#define KEYBOARD_SWITCH_IO 15   
 //// Expose a C friendly interface for main functions.
 //#ifdef __cplusplus
 // extern "C" {

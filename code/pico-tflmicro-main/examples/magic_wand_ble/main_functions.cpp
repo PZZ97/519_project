@@ -159,7 +159,7 @@ void mpu6050_reset() {
     uint8_t addr1 = 0x68;
     uint8_t addr2 = 0x69;
     i2c_write_blocking(i2c1, addr1, buf, 2, false);
-    i2c_write_blocking(i2c1, addr2, buf, 2, false);
+    // i2c_write_blocking(i2c1, addr2, buf, 2, false);
 }
 void mpu6050_read_raw(uint8_t addr, int16_t accel[3], int16_t gyro[3]) { // add int16_t *temp for temperature if needs
     // For this particular device, we send the device the register we want to read
@@ -197,15 +197,53 @@ void mpu6050_read_raw(uint8_t addr, int16_t accel[3], int16_t gyro[3]) { // add 
     // *temp = buffer[0] << 8 | buffer[1];
 }
 // #endif
+void mpu6050_read_data(uint8_t addr, float _accel[3], float _gyro[3]) { // add int16_t *temp for temperature if needs
+    // For this particular device, we send the device the register we want to read
+    // first, then subsequently read from the device. The register is auto incrementing
+    // so we don't need to keep sending the register we want, just the first.
+
+    uint8_t buffer[6];
+
+    // Start reading acceleration registers from register 59 (0x3B) for 6 bytes, x,y,z each with two bits
+    // default +- 2g, 16384 b/g
+    uint8_t val = 0x3B;
+    i2c_write_blocking(i2c1, addr, &val, 1, true); // true to keep master control of bus
+    i2c_read_blocking(i2c1, addr, buffer, 6, false);
+
+    int16_t accel[3];
+    for (int i = 0; i < 3; i++) {
+        accel[i] = (buffer[i * 2] << 8 | buffer[(i * 2) + 1]);
+        _accel[i]=(float)_accel[i]*4.0 / 32768.0;
+    }
+
+    int16_t gyro[3];
+    // Now gyro data from reg 67 (0x43) for 6 bytes
+    // The register is auto incrementing on each read
+    val = 0x43;
+    i2c_write_blocking(i2c1, addr, &val, 1, true);
+    i2c_read_blocking(i2c1, addr, buffer, 6, false);  // False - finished with bus
+
+    for (int i = 0; i < 3; i++) {
+        gyro[i] = (buffer[i * 2] << 8 | buffer[(i * 2) + 1]);
+        _gyro[i]=(float)gyro[i]*250.0 / 32768.0;
+    }
+}
+// #endif
 
 void imu_print() {
     int16_t acceleration1[3], gyro1[3], temp1;
     int16_t acceleration2[3], gyro2[3], temp2;
     mpu6050_read_raw(0x68, acceleration1, gyro1);// &temp1
-    mpu6050_read_raw(0x69, acceleration2, gyro2);// &temp2
+    char str[100];
+    sprintf(str,"Acc1. X = %d, Y = %d, Z = %d\n", acceleration1[0], acceleration1[1], acceleration1[2]);
+    uart_puts(uart0,str);
+    sprintf(str,"Gyro1. X = %d, Y = %d, Z = %d\n", gyro1[0], gyro1[1], gyro1[2]);
+    uart_puts(uart0,str);
+    
+    // mpu6050_read_raw(0x69, acceleration2, gyro2);// &temp2
     // These are the raw numbers from the chip, so will need tweaking to be really useful.
-    //printf("Acc1. X = %d, Y = %d, Z = %d\n", acceleration1[0], acceleration1[1], acceleration1[2]);
-    //printf("Acc2. X = %d, Y = %d, Z = %d\n", acceleration2[0], acceleration2[1], acceleration2[2]);
+    printf("Acc1. X = %d, Y = %d, Z = %d\n", acceleration1[0], acceleration1[1], acceleration1[2]);
+    // printf("Acc2. X = %d, Y = %d, Z = %d\n", acceleration2[0], acceleration2[1], acceleration2[2]);
     //printf("Gyro1. X = %d, Y = %d, Z = %d\n", gyro1[0], gyro1[1], gyro1[2]);
     //printf("Gyro2. X = %d, Y = %d, Z = %d\n", gyro2[0], gyro2[1], gyro2[2]);
     // Temperature is simple so use the datasheet calculation to get deg C.
@@ -213,11 +251,16 @@ void imu_print() {
     ////printf("Temp. = %f\n", (temp1 / 340.0) + 36.53);
 }
 
+// #define 
 void setup() {
   gpio_init(25);
   gpio_set_dir(25, GPIO_OUT);
   gpio_put(25, !gpio_get(25));
   
+  // keyboard switch button
+  gpio_init(KEYBOARD_SWITCH_IO);
+  gpio_set_dir(KEYBOARD_SWITCH_IO, GPIO_IN);
+  gpio_pull_up(KEYBOARD_SWITCH_IO);
 #if SCREEN
   ST7735_Init();
   ST7735_DrawImage(0, 0, 80, 160, arducam_logo);
@@ -522,6 +565,9 @@ void loop() {
         displayBuf[index++] = (uint8_t)(imageRGB)&0xFF;
       }
       line[raster_width] = 0;
+      // char str[100] ;
+      // sprintf(str,"%s\n",line);
+      // uart_puts(uart0, str);
       //printf("%s\n", line);
     }
 
@@ -572,10 +618,11 @@ void keyboard_loop() {
   int accelerometer_samples_read;
   int gyroscope_samples_read;
 
-  int16_t acceleration1[3], gyro1[3];
-  mpu6050_read_raw(0x69, acceleration1, gyro1);
-  ReadMPU6050(&accelerometer_samples_read, &gyroscope_samples_read, acceleration1, gyro1);
-
+  for(int i=0;i<3;++i){
+    float acceleration1[3], gyro1[3];
+    mpu6050_read_data(0x68, acceleration1, gyro1);
+    ReadMPU6050(&accelerometer_samples_read, &gyroscope_samples_read, acceleration1, gyro1);
+  }
   // Parse and process IMU data
   bool done_just_triggered = false;
   if (gyroscope_samples_read > 0) {
@@ -609,6 +656,9 @@ void keyboard_loop() {
   }
   // Wait for a gesture to be done
   if (done_just_triggered and !linked) {
+    // char print_1[100];
+    // sprintf(print_1,"a gesture has done\n");
+    // uart_puts(uart0,print_1);
     // Rasterize the gesture
     RasterizeStroke(stroke_points, *stroke_transmit_length, 0.6f, 0.6f, raster_width,
                     raster_height, raster_buffer);
@@ -635,7 +685,12 @@ void keyboard_loop() {
         displayBuf[index++] = (uint8_t)(imageRGB)&0xFF;
       }
       line[raster_width] = 0;
-      //printf("%s\n", line);
+      
+      // printf("%s\n", line);
+      // uart_puts(uart0, line);
+            char str[100] ;
+      sprintf(str,"%s\r\n",line);
+      uart_puts(uart0, str);
     }
 
     // Pass to the model and run the interpreter
@@ -664,6 +719,7 @@ void keyboard_loop() {
     }
     TF_LITE_REPORT_ERROR(error_reporter, "Found %s (%d%%)", labels[max_index],
                          ((max_score + 128) * 100) >> 8);
+    // labels[max_index]
 #if SCREEN
 
     // char str1[10], str2[10], str3[10];
@@ -676,7 +732,6 @@ void keyboard_loop() {
     // // ST7735_DrawImage(24, 91, 32, 32, displayBuf);
     // ST7735_WriteString(15, 130, str1, Font_11x18, ST7735_BLACK, ST7735_GREEN);
 #endif
-
     delete[] displayBuf;
   }
 }

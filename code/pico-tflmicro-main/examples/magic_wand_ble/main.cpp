@@ -19,15 +19,32 @@ limitations under the License.
 // point. Other devices (for example FreeRTOS or ESP32) that have different
 // requirements for entry code (like an app_main function) should specialize
 // this main.cc file in a target-specific subfolder.
+enum TASKS{
+  KEYBOARD=0,
+  MOUSE
+};
 int main(int argc, char *argv[]) {
   setup();
+  uint8_t state=0;
   while (true) {
-    // replace with a GPIO read logic to switch between mouse and keyboard
-      // loop(); 
-      // IMUupdate(); 
-      // screen_show();
-      mouse_abs_position(); 
-      // void keyboard_loop();
-    // sleep_ms(10);  // call of sleep_ms() will lead to unrecognize of USB device 
+    static bool switch_keyboard_mouse=true;
+    switch_keyboard_mouse=gpio_get(KEYBOARD_SWITCH_IO);
+    if(!switch_keyboard_mouse){  // btn pressed
+      switch_keyboard_mouse=true;
+      state=~state;
+       char str[50] ="switch\r\n";
+        uart_puts(uart0, str);
+    }
+      if(state==MOUSE){
+          mouse_abs_position(); 
+      }
+      else
+      {        
+         keyboard_loop();
+        // char str[50] ="Keyboard\r\n";
+        // uart_puts(uart0, str);
+        tud_task();
+        // hid_task();
+      }
   }
 }

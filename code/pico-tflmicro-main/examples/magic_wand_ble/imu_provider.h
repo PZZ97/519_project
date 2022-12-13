@@ -152,7 +152,12 @@ void ReadAccelerometerAndGyroscope(int *new_accelerometer_samples,
 }
 
 void ReadMPU6050(int *new_accelerometer_samples,int *new_gyroscope_samples,
-                              int16_t *acceleration1,int16_t* gyro1) {
+                              float *acceleration1,float* gyro1) {
+                                  char str[100];
+  // sprintf(str,"__Acc1. _X = %d, _Y = %d, _Z = %d\n", acceleration1[0], acceleration1[1], acceleration1[2]);
+  // uart_puts(uart0,str);
+  // sprintf(str,"__Gyro1. _X = %d, _Y = %d, _Z = %d\n", gyro1[0], gyro1[1], gyro1[2]);
+  // uart_puts(uart0,str);
   // Keep track of whether we stored any new data
   *new_accelerometer_samples = 0;
   *new_gyroscope_samples     = 0;
@@ -165,16 +170,18 @@ void ReadMPU6050(int *new_accelerometer_samples,int *new_gyroscope_samples,
       acceleration_data_index += 3;
       float *current_acceleration_data     = &acceleration_data[acceleration_index];
 
-      current_gyroscope_data[0] = gyro1[0];
-      current_gyroscope_data[1] = gyro1[1];
+      current_gyroscope_data[0] = -gyro1[1];
+      current_gyroscope_data[1] = -gyro1[0];
       current_gyroscope_data[2] = gyro1[2];
       *new_gyroscope_samples += 1;
 
-      current_acceleration_data[0] = acceleration1[0];
-      current_acceleration_data[1] = acceleration1[1];
+      current_acceleration_data[0] = -acceleration1[1];
+      current_acceleration_data[1] = -acceleration1[0];
       current_acceleration_data[2] = acceleration1[2];
       *new_accelerometer_samples += 1;
-      
+      // char test_data[100];
+      // sprintf(test_data,"acceleration1[0]=%.3f,gyro[0]=%.3f\n",acceleration1[0],gyro1[0]);
+      // uart_puts(uart0,test_data);
       // char temp1[20];
       // sprintf(temp1, " %d  %d  %d \r\n", current_acceleration_data[0], current_acceleration_data[1], current_acceleration_data[2]);
       // uart_puts(uart0, temp1);
@@ -389,7 +396,7 @@ void calculate_movement(){
   }
   char temp1[20];
   sprintf(temp1, "\n%d  %d  %d \r\n", mouse_position[0], goal_position[0], mouse_movement[0]);
-  uart_puts(uart0, temp1);
+  // uart_puts(uart0, temp1);
 }
 
 // let |velocity|<=1
@@ -841,7 +848,7 @@ void calculate_movement(float _angle_xz,float _angle_yz,int8_t* _mouse_movement,
   }
   char temp1[20];
   sprintf(temp1, "\n%d  %d  %d \r\n", mouse_position[0], goal_position[0], _mouse_movement[0]);
-  uart_puts(uart0, temp1);
+  // uart_puts(uart0, temp1);
 }
 
 
