@@ -230,6 +230,15 @@ void mpu6050_read_data(uint8_t addr, float _accel[3], float _gyro[3]) { // add i
 }
 // #endif
 
+void ReadICM42622(float acc[3], float gyro[3]){
+  ICM42622::Icm42622ReadAccel(&acc[0],
+                              &acc[1],
+                              &acc[2]);
+  ICM42622::Icm42622ReadGyro(&gyro[0],
+                             &gyro[1],
+                             &gyro[2]);                            
+}
+
 void imu_print() {
     int16_t acceleration1[3], gyro1[3], temp1;
     int16_t acceleration2[3], gyro2[3], temp2;
@@ -611,6 +620,20 @@ void loop() {
 #endif
     delete[] displayBuf;
   }
+}
+
+void click_detect(){
+  float right_acc[3], right_gyro[3];
+  float left_acc[3], left_gyro[3];
+  float palm_acc[3], palm_gyro[3];
+  mpu6050_read_data(0x69, right_acc, right_gyro);
+  mpu6050_read_data(0x68, left_acc, left_gyro);
+  float v_right = VectorMagnitude(right_acc);
+  float v_left = VectorMagnitude(left_acc);
+  char str[40] ;
+  sprintf(str," %.2f  %.2f\r\n",v_right, v_left);
+  uart_puts(uart0, str);
+
 }
 
 void keyboard_loop(char & key) {

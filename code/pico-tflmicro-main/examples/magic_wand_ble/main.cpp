@@ -25,16 +25,23 @@ enum TASKS{
 };
 int main(int argc, char *argv[]) {
   setup();
-  uint8_t state=0;
+  bool state=0;
+  const uint32_t interval_ms = 1000;
+  static uint32_t start_ms = 0;
   while (true) {
      tud_task();
-    static bool switch_keyboard_mouse=true;
     bool cur_switch=gpio_get(KEYBOARD_SWITCH_IO);
-    if(cur_switch!=switch_keyboard_mouse){  // btn pressed
-      switch_keyboard_mouse=!switch_keyboard_mouse;
-      state=!state;
-       char str[50] ="switch\r\n";
-        uart_puts(uart0, str);
+    if(cur_switch == false){  // btn pressed     
+      if ( board_millis() - start_ms > interval_ms) { // avoid repeat detection
+        sleep_ms(20);
+        cur_switch=gpio_get(KEYBOARD_SWITCH_IO);
+        if(cur_switch == false){
+          state=!state;
+          start_ms = board_millis();
+          char str[50] ="switch\r\n";
+          uart_puts(uart0, str);
+        }
+      }
     }
       if(state==MOUSE){
           mouse_abs_position(); 
@@ -48,9 +55,6 @@ int main(int argc, char *argv[]) {
           sprintf(str, "Key=%c\r\n",key);
           uart_puts(uart0, str);
          }
-        
-        // tud_task();
-        // hid_task();
       }
 
   }
