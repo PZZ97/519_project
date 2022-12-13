@@ -117,17 +117,30 @@ static void send_hid_report(uint8_t report_id, uint32_t btn, int8_t cursor_x, in
       // use to avoid send multiple consecutive zero report for keyboard
       static bool has_keyboard_key = false;
 
-      if ( btn )
+      if ( btn !=0)
       {
-        uint8_t keycode[6] = { 0 };
-        keycode[0] = HID_KEY_A;
+        // ascii_to_keycode
+        char key = (char)btn;
 
+        uint8_t keycode[6] = { 0 };
+        // keycode[0] = ascii_to_keycode[(uint8_t)key][0];
+        
+        if(key=='0'){
+          keycode[0] =HID_KEY_0;
+        }
+        else
+          keycode[0] =HID_KEY_1+ key-'1';
         tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, keycode);
         has_keyboard_key = true;
+        tud_task();
+        keycode[0] =0;
+        tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, keycode);
       }else
       {
         // send empty key report if previously has key pressed
-        if (has_keyboard_key) tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, NULL);
+        uint8_t keycode[6] = { 0 };
+         keycode[0] =HID_KEY_NONE;
+        if (has_keyboard_key) tud_hid_keyboard_report(REPORT_ID_KEYBOARD, 0, keycode);
         has_keyboard_key = false;
       }
     }
@@ -196,6 +209,7 @@ static void send_hid_report(uint8_t report_id, uint32_t btn, int8_t cursor_x, in
 
     default: break;
   }
+  
 }
 
 void get_data(int8_t *data)
@@ -237,6 +251,40 @@ void hid_task(bool &flag)
   }
 }
 
+// used for hid keyboard -created by pp
+void hid_keyboard_task(char key,bool &flag)
+{
+  // Poll every 10ms
+  const uint32_t interval_ms = 10;
+  static uint32_t start_ms = 0;
+  if ( board_millis() - start_ms < interval_ms) { 
+  flag = false;
+  return; // not enough time
+  }
+  start_ms += interval_ms;
+  // uint32_t const btn = board_button_read();
+
+  // Remote wakeup
+  /*
+  if ( tud_suspended() && btn )
+  {
+    // Wake up host if we are in suspend mode
+    // and REMOTE_WAKEUP feature is enabled by host
+    flag = false;
+    tud_remote_wakeup();
+  }else
+  {
+    */
+    // Send the 1st of report chain, the rest will be sent by tud_hid_report_complete_cb()
+    send_hid_report(REPORT_ID_KEYBOARD, key,0,0);
+    flag = true;
+    // if ( tud_hid_ready() ){
+    //   send_hid_report(REPORT_ID_MOUSE, btn, cursor_x, cursor_y);
+    //   flag = true;
+    
+  /*}*/
+}
+
 // Invoked when sent REPORT successfully to host
 // Application can use this to send the next report
 // Note: For composite reports, report[0] is report ID
@@ -249,7 +297,8 @@ void tud_hid_report_complete_cb(uint8_t instance, uint8_t const* report, uint8_t
 
   if (next_report_id < REPORT_ID_COUNT)
   {
-    send_hid_report(next_report_id, board_button_read(), cursor_x, cursor_y); // 暂时没用到这个函数
+    // send_hid_report(next_report_id, board_button_read(), cursor_x, cursor_y); // 暂时没用到这个函数
+    send_hid_report(next_report_id, 0, cursor_x, cursor_y); // 暂时没用到这个函数
   }
 }
 
