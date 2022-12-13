@@ -618,7 +618,7 @@ void keyboard_loop(char & key) {
   int accelerometer_samples_read;
   int gyroscope_samples_read;
 
-  for(int i=0;i<3;++i){
+  for(int i=0;i<1;++i){
     float acceleration1[3], gyro1[3];
     mpu6050_read_data(0x68, acceleration1, gyro1);
     ReadMPU6050(&accelerometer_samples_read, &gyroscope_samples_read, acceleration1, gyro1);
