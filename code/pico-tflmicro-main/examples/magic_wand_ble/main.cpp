@@ -27,11 +27,12 @@ int main(int argc, char *argv[]) {
   setup();
   uint8_t state=0;
   while (true) {
+     tud_task();
     static bool switch_keyboard_mouse=true;
-    switch_keyboard_mouse=gpio_get(KEYBOARD_SWITCH_IO);
-    if(!switch_keyboard_mouse){  // btn pressed
-      switch_keyboard_mouse=true;
-      state=~state;
+    bool cur_switch=gpio_get(KEYBOARD_SWITCH_IO);
+    if(cur_switch!=switch_keyboard_mouse){  // btn pressed
+      switch_keyboard_mouse=!switch_keyboard_mouse;
+      state=!state;
        char str[50] ="switch\r\n";
         uart_puts(uart0, str);
     }
@@ -40,11 +41,17 @@ int main(int argc, char *argv[]) {
       }
       else
       {        
-         keyboard_loop();
-        // char str[50] ="Keyboard\r\n";
-        // uart_puts(uart0, str);
-        tud_task();
+        char key =0;
+         keyboard_loop(key);
+         if(key!=0){
+          char str[50];
+          sprintf(str, "Key=%c\r\n",key);
+          uart_puts(uart0, str);
+         }
+        
+        // tud_task();
         // hid_task();
       }
+
   }
 }

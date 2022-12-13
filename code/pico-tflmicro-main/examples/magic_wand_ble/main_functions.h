@@ -35,7 +35,7 @@ void mouse_abs_position();
 void imu_print();
 void screen_show();
 void IMUupdate();
-void keyboard_loop();
+void keyboard_loop(char&);
 //#ifdef __cplusplus
 //}
 //#endif

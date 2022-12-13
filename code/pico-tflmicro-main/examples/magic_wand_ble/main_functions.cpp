@@ -211,7 +211,7 @@ void mpu6050_read_data(uint8_t addr, float _accel[3], float _gyro[3]) { // add i
     i2c_read_blocking(i2c1, addr, buffer, 6, false);
 
     int16_t accel[3];
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 1; i++) {
         accel[i] = (buffer[i * 2] << 8 | buffer[(i * 2) + 1]);
         _accel[i]=(float)_accel[i]*4.0 / 32768.0;
     }
@@ -613,7 +613,7 @@ void loop() {
   }
 }
 
-void keyboard_loop() {
+void keyboard_loop(char & key) {
   gpio_put(25, !gpio_get(25));
   int accelerometer_samples_read;
   int gyroscope_samples_read;
@@ -719,6 +719,7 @@ void keyboard_loop() {
     }
     TF_LITE_REPORT_ERROR(error_reporter, "Found %s (%d%%)", labels[max_index],
                          ((max_score + 128) * 100) >> 8);
+    key = labels[max_index][0];
     // labels[max_index]
 #if SCREEN
 
