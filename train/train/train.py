@@ -33,14 +33,14 @@ def file_dataset_from_directory(data_path, data_type):
 	data = []
 	label = []
 	my_dataset_data = []
-  my_dataset_label = []
+	my_dataset_label = []
 
 	for name in class_names:
 		# print(name)
 		data_dir = data_path / pathlib.Path(name)
 		for filename in os.listdir(data_dir):
 			file_dir = os.path.join(data_dir, filename)
-			# checking if it is a file
+			# Checking if it is a file
 			if os.path.isfile(file_dir):
 				# print(file_dir)
 				with open(file_dir, "r") as f:
@@ -48,9 +48,16 @@ def file_dataset_from_directory(data_path, data_type):
 					# print(file_dir)
 					content = resize_file_data(content)
 					data.append(content)
-					# data and label type should be the same
-					label.append(int(ord(name)) - 55)
-					# print(data)
+					# Data and label type should be the same
+					# Modify the labels to 0-35
+					curr_label = int(ord(name))
+					# print(f'the old label of {name} is: {curr_label}')
+					if (curr_label > 57):
+						curr_label = curr_label - 55
+					else:
+						curr_label = curr_label - 48
+					label.append(curr_label)
+					# print(f'the new label of {name} is: {curr_label}')
 
 	# Shuffle the data and label in the same order
 	idx = np.random.permutation(len(data))
@@ -89,7 +96,7 @@ def file_dataset_from_directory(data_path, data_type):
 # Define a simple sequential model
 def create_model():
 	model = tf.keras.Sequential([
-		layers.Conv2D(8, 3, padding='same', activation='relu', input_shape=(INPUT_HEIGHT, INPUT_WIDTH, INPUT_CHANNEL)),
+		layers.Conv2D(8, 5, padding='same', activation='relu', input_shape=(INPUT_HEIGHT, INPUT_WIDTH, INPUT_CHANNEL)),
 		layers.MaxPooling2D((2, 2)),
 		layers.Dropout(0.5),
 		layers.Conv2D(16, 3, padding='same', activation='relu'),
@@ -97,7 +104,7 @@ def create_model():
 		layers.Dropout(0.5),
 		layers.Flatten(),
 		layers.Dense(128, activation='relu'),
-		layers.Dropout(0.5),
+		# layers.Dropout(0.5),
 		layers.Dense(NUM_CLASSES, activation="softmax")
 	])
 
@@ -136,7 +143,8 @@ if __name__ == "__main__":
 	model = create_model()
 	model.summary()
 
-	epochs = 10
+	# Train the model with epochs
+	epochs = 50
 	# fit model
 	his = model.fit(
 		train_ds,
@@ -161,7 +169,7 @@ if __name__ == "__main__":
 
 	# Save the tflite model
 	with open('model.tflite', 'wb') as f:
-	f.write(tflite_model)
+		f.write(tflite_model)
 
 	# Convert the tflite model to binary: use command xxd -i model.tflite > model_data.cc
 
