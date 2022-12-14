@@ -138,7 +138,7 @@ static void send_hid_report(uint8_t report_id, uint32_t btn, int8_t cursor_x, in
       // no button, right + down, no scroll, no pan
       //(uint8_t report_id, uint8_t buttons, int8_t x, int8_t y, int8_t vertical, int8_t horizontal); position and rolling
       // tud_hid_mouse_report(REPORT_ID_MOUSE, 0x00, cursor_x, cursor_y, 0, 0);
-      tud_hid_mouse_report(REPORT_ID_MOUSE, 0X00, cursor_x, cursor_y, 0,0);
+      tud_hid_mouse_report(REPORT_ID_MOUSE, uint8_t(btn), cursor_x, cursor_y, 0,0);
       // MOUSE_BUTTON_RIGHT -> LEFT CLICK
       
       // TU_BIT(0);
@@ -205,7 +205,7 @@ void get_data(int8_t *data)
 }
 // Every 50ms, we will sent 1 report for each HID profile (keyboard, mouse etc ..)
 // tud_hid_report_complete_cb() is used to send the next report after previous one is complete
-void hid_task(bool &flag)
+void hid_task(bool &flag, uint32_t btn)
 {
   // Poll every 10ms
   const uint32_t interval_ms = 10;
@@ -215,7 +215,7 @@ void hid_task(bool &flag)
   return; // not enough time
   }
   start_ms += interval_ms;
-  uint32_t const btn = board_button_read();
+  // uint32_t const btn = board_button_read();
   // Remote wakeup
   if ( tud_suspended() && btn )
   {

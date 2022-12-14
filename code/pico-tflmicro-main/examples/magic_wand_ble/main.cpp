@@ -45,6 +45,7 @@ int main(int argc, char *argv[]) {
     }
       if(state==MOUSE){
           mouse_abs_position(); 
+          click_detect();
       }
       else
       {        

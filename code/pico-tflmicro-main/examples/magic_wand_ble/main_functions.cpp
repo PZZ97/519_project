@@ -56,7 +56,7 @@ limitations under the License.
 #define UART1_RX_PIN 5
 #define ADDR_PIN1 26
 #define ADDR_PIN2 27
-
+#define CLICK_THRES 1.0
 namespace {
 bool     linked     = false;
 bool     first      = true;
@@ -159,7 +159,7 @@ void mpu6050_reset() {
     uint8_t addr1 = 0x68;
     uint8_t addr2 = 0x69;
     i2c_write_blocking(i2c1, addr1, buf, 2, false);
-    // i2c_write_blocking(i2c1, addr2, buf, 2, false);
+    i2c_write_blocking(i2c1, addr2, buf, 2, false);
 }
 void mpu6050_read_raw(uint8_t addr, int16_t accel[3], int16_t gyro[3]) { // add int16_t *temp for temperature if needs
     // For this particular device, we send the device the register we want to read
@@ -211,9 +211,9 @@ void mpu6050_read_data(uint8_t addr, float _accel[3], float _gyro[3]) { // add i
     i2c_read_blocking(i2c1, addr, buffer, 6, false);
 
     int16_t accel[3];
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 3; i++) {
         accel[i] = (buffer[i * 2] << 8 | buffer[(i * 2) + 1]);
-        _accel[i]=(float)_accel[i]*4.0 / 32768.0;
+        _accel[i]=(float)accel[i]*2.0 / 32768.0;
     }
 
     int16_t gyro[3];
@@ -370,7 +370,7 @@ void setup() {
   gpio_put(ADDR_PIN1, 0);
   gpio_put(ADDR_PIN2, 1);
   // printf("Finish initialize MPU6050! Reading raw data from registers...\n");
-  // estimate the gravity in ICM20948
+  // estimate the gravity in ICM42622
   EstimateGravityDirection(current_gravity);
 }
 
@@ -413,7 +413,6 @@ void mouse_abs_position(){ // input is the cursor position
   static bool is_gravity_ready_flag=false;
   static float mouse_angle_xz, mouse_angle_yz;
   static int8_t  mouse_movement[2]={0};
-  static bool hid_sent_flag = false;
 
   ReadAccelAndGyro(&gyroscope_samples_read,
                    mouse_gyro,
@@ -435,9 +434,9 @@ void mouse_abs_position(){ // input is the cursor position
     // UpdateVelocity(accelerometer_samples_read, gravity_now);
   }
   calculate_movement(mouse_angle_xz, mouse_angle_yz, mouse_movement, hid_sent_flag);
-  tud_task();
+  // tud_task(); // already in the main loop
   get_data(mouse_movement);
-  hid_task(hid_sent_flag); // make sure hid run the movement command
+  hid_task(hid_sent_flag, 0); // make sure hid run the movement command
 }
 
 
@@ -628,12 +627,22 @@ void click_detect(){
   float palm_acc[3], palm_gyro[3];
   mpu6050_read_data(0x69, right_acc, right_gyro);
   mpu6050_read_data(0x68, left_acc, left_gyro);
+  ReadICM42622(palm_acc, palm_gyro);
   float v_right = VectorMagnitude(right_acc);
   float v_left = VectorMagnitude(left_acc);
-  char str[40] ;
-  sprintf(str," %.2f  %.2f\r\n",v_right, v_left);
-  uart_puts(uart0, str);
-
+  float v_palm = VectorMagnitude(palm_acc);
+  bool temp_flag;
+  if(v_right - v_palm > CLICK_THRES){
+    hid_task(temp_flag, 2);
+    uart_puts(uart0, "Right click");
+  }
+  if(v_left - v_palm > CLICK_THRES){
+    hid_task(temp_flag, 1);
+    uart_puts(uart0, "Left click");
+  }
+  // char str[40] ;
+  // sprintf(str," %f  %f  %f\r\n", v_right, v_left, v_palm);
+  // uart_puts(uart0, str);
 }
 
 void keyboard_loop(char & key) {

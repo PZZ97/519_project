@@ -37,7 +37,7 @@
 // #include "main_functions.h"
 // Every 10ms, we will sent 1 report for each HID profile (keyboard, mouse etc ..)
 // tud_hid_report_complete_cb() is used to send the next report after previous one is complete
-void hid_task(bool &flag);
+void hid_task(bool &flag, uint32_t btn);
 void get_data(int8_t *data);
 void led_blinking_task(void);
 

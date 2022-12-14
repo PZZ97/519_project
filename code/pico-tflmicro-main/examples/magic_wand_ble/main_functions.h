@@ -36,6 +36,7 @@ void imu_print();
 void screen_show();
 void IMUupdate();
 void keyboard_loop(char&);
+void click_detect();
 //#ifdef __cplusplus
 //}
 //#endif
