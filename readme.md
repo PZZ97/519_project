@@ -92,8 +92,8 @@ Description.
 
 |Member|Github Account|Contribution|
 |:--|:--|:--|
-|Rongqian Chen|@willchan|Implemented curser moving, mouse left clicking, mouse right clicking functions.
-|Qi Xue|@suexueqi|Collected data for gesture recognization model, building the model from scartch (including the data processing, model structure tuning, and model training), and implemented model deploying function which connected the gesture recogniztion model with the system.
+|Rongqian Chen|@WillChan9|Implemented curser moving, mouse left clicking, mouse right clicking functions.
+|Qi Xue|@sueqixue|Collected data for gesture recognization model, building the model from scartch (including the data processing, model structure tuning, and model training), and implemented model deploying function which connected the gesture recogniztion model with the system.
 |Junpeng Zhao|@PZZ97|Investigate tinyusb API, IMU data flitering algorithm, reconstruct code body, mouse and keyboard PIO.
 
 ## VI - Others:
