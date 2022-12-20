@@ -57,33 +57,6 @@ The new model is about twice as big as the original model (original model: aroun
 
 <img src="./train/images/out_of_memory_issue.png" alt="Memory_Issue" width="600"/>
 
-### 3.4 Notes
-Add this at the beginning of model.cc:
-
-```
-/* Copyright 2022 The TensorFlow Authors. All Rights Reserved.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-==============================================================================*/
-
-// Automatically created from a TensorFlow Lite flatbuffer using the command:
-// xxd -i magic_wand_model.tflite > magic_wand_model_data.cc
-// See the README for a full description of the creation process.
-
-#include "magic_wand_model_data.h"
-
-const unsigned char g_magic_wand_model_data[]
-```
 ## IV - Mouse and Keyboard PIO
 
 Description.
@@ -97,6 +70,7 @@ Description.
 |Junpeng Zhao|@PZZ97|Investigate tinyusb API, IMU data flitering algorithm, reconstruct code body, mouse and keyboard PIO.
 
 ## VI - Others:
+
 ### 6.1 Materials:
 |Module|Quantity|
 |:--|:--|
@@ -104,6 +78,8 @@ Description.
 |MPU6050|2|
 |3D printed rings|2|
 |glove|1|
+
 ### 6.2 Reference 
-Arducam/pico-tfmicro/magic-wand-ble</br>
+[Arducam/pico-tfmicro/magic-wand-ble](https://github.com/ArduCAM/pico-tflmicro)
+
 Tinyusb 
