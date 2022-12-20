@@ -1,6 +1,10 @@
-# Overview
+# ESE 5060 Final Project (Team Dark Moon): A Mouse-keyboard System Embedded on A Glove
+
+<img src="./media/mouse_keyboard_glove.jpg" alt="Glove" width="300"/>
+
+## Overview
 ### What is it?
-* We designed a keyboard-mouse system which have the curser moving, right clicking, left clicking, and gesture writing functions.
+* We designed a mouse-keyboard system which have the curser moving, right clicking, left clicking, and gesture writing functions.
 * User can achive the curser function by rotating hand and can achived the clicking function by shaking fingers in the air. The keyboard function is under implementation.
 
 ### How to use it?
@@ -21,7 +25,7 @@
   * Although we already trained a model that can recognize 26 character and digits, the trained model cannot be deployed on board because some unidentifed errors;
   * We haven't understand the logic to use keyboard API from tinyusb, we didn't find the release keycode method before project deadline. 
 
-# Contribution
+## Contribution
 
 |Member|Github Account|Contribution|
 |:--|:--|:--|
@@ -29,9 +33,9 @@
 |Qi Xue|@suexueqi|Collected data for gesture recognization model, building the model from scartch (including the data processing, model structure tuning, and model training), and implemented model deploying function which connected the gesture recogniztion model with the system.
 |Junpeng Zhao|@PZZ97|Investigate tinyusb API, IMU data flitering algorithm, reconstruct code body, mouse and keyboard PIO.
 
-# Mouse Functions
+## Mouse Functions
 
-# Keyboard Functions
+## Keyboard Functions
 
 ### Goal
 The original magic_wand_ble model can only classify between 0-9. We built our network to classify between both 0-9 and A-Z, which means our model has 36 classes now.
@@ -86,9 +90,9 @@ limitations under the License.
 
 const unsigned char g_magic_wand_model_data[]
 ```
-# Mouse and Keyboard PIO
+## Mouse and Keyboard PIO
 
-# Others:
+## Others:
 ### Materials:
 |module|quantity|
 |:--|:--|
