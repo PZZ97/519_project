@@ -98,7 +98,7 @@ Description.
 
 ## VI - Others:
 ### 6.1 Materials:
-|module|quantity|
+|Module|Quantity|
 |:--|:--|
 |Pico4ML|1|
 |MPU6050|2|
