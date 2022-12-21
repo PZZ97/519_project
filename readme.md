@@ -16,8 +16,7 @@
 * We also applied one IMU on thumb and one on index finger to catch an accident and fast movment for clicking use.
 
 ### 1.4 Where did we apply PIO program?
-* Unfortunately we didn't applied PIO in our program at last. PIO is a good tool to work as a flexiable commmunication port such as UART, IIC or SPI, but considering we only need one I2C port for our application so we gave up this idea. We also considered using PIO to do simple data processing: addition. PIO can achieve addition in the way `x+y=~(x+~y)`.
-* To do so, PIO will invert x and y and then using a loop `(x--==y? y--:x--)`. It did a fair work if it calculates small numbers, while if the number is extremenly large or it is a negative number, it is possible to reach 2^32 iteration for a result, in our experiment, it is very slow to calcute summation between two large positive number or addition including negative number. So we had to gave up this idea as well. But if anyone knows how to optimze this process, feel free to contact us!
+* Unfortunately we didn't applied PIO in our program at last. We intended to use it to do addition at the beginning based on bit operation `x + y == ~(~x - y)`. We will explain this later. 
 
 ### 1.5 What we haven't done:
 * Actually our inital design is a device intergrated mouse and keyboard functions. In our inital plan, keyboard can be achived by adjusting Arducam's magic-wand-ble example and combining tinyusb's HID API.
@@ -57,9 +56,10 @@ The new model is about twice as big as the original model (original model: aroun
 
 <img src="./train/images/out_of_memory_issue.png" alt="Memory_Issue" width="600"/>
 
-## IV - Mouse and Keyboard PIO
+## IV -  PIO
 
-Description.
+PIO is a good tool to work as a flexiable commmunication port such as UART, IIC or SPI, but considering we only need one I2C port for our application so we gave up this idea. We also considered using PIO to do simple data processing: addition. PIO can achieve addition in the way `x + y == ~(~x - y)`.
+* To do so, PIO will invert x and y and then using a loop to execute `while(y--) x--`. It did a fair work if it calculates small numbers, while if the number is extremenly large or it is a negative number, it is possible to reach 2^32 iteration for a result, in our experiment, it is very slow to calcute summation between two large positive number or addition including negative number. So we had to gave up this idea as well. But if anyone knows how to optimze this process, feel free to contact us!
 
 ## V - Contribution
 
@@ -67,7 +67,7 @@ Description.
 |:--|:--|:--|
 |Rongqian Chen|@WillChan9|Implemented curser moving, mouse left clicking, mouse right clicking functions.
 |Qi Xue|@sueqixue|Collected data for gesture recognization model, building the model from scartch (including the data processing, model structure tuning, and model training), and implemented model deploying function which connected the gesture recogniztion model with the system.
-|Junpeng Zhao|@PZZ97|Investigate tinyusb API, IMU data flitering algorithm, reconstruct code body, mouse and keyboard PIO.
+|Junpeng Zhao|@PZZ97|Investigate tinyusb API, IMU data flitering algorithm, reconstruct code body to adapt to multifunctions, PIO application.
 
 ## VI - Others:
 
