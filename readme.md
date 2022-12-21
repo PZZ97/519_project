@@ -23,11 +23,30 @@
 * We didn't accomplish keyboard function, but we did want to let you know that we also spent lots of time on that function. There're still two issues unresloved in keyboard part:
   * Although we already trained a model that can recognize 26 character and digits, the trained model cannot be deployed on board because some unidentifed errors;
   * We haven't understand the logic to use keyboard API from tinyusb, we didn't find the release keycode method before project deadline. 
-
+---
 ## II - Mouse Functions
+### 3.1 Data filter
+The raw data accessed from the IMU sensor contained extensive noise, which complicated the problem. Therefore, to acqurie a clean data, we needed to apply a filter to smooth the raw data. We compared slide window filter and Kalman filter and decided to use slide window because of the adaptabiltiy and simple execution. It mainly averaged the past data in a fixed window size plus the current data. By adjusting the windows size, we can acquire data in different smooth level. A slide window example is displayed below, effects can be easily observed. 
 
-Description.
+<img src="./media/slide_window.png" alt="Data_Type_Issue" width="300"/>
 
+
+### 3.2
+----
+D
+e
+s
+c
+r
+i
+p
+t
+i
+o
+n
+. 
+
+----
 ## III - Keyboard Functions
 
 ### 3.1 Goal
@@ -56,10 +75,13 @@ The new model is about twice as big as the original model (original model: aroun
 
 <img src="./train/images/out_of_memory_issue.png" alt="Memory_Issue" width="600"/>
 
+---
+
 ## IV -  PIO
 
 PIO is a good tool to work as a flexiable commmunication port such as UART, IIC or SPI, but considering we only need one I2C port for our application so we gave up this idea. We also considered using PIO to do simple data processing: addition. PIO can achieve addition in the way `x + y == ~(~x - y)`.
 * To do so, PIO will invert x and y and then using a loop to execute `while(y--) x--`. It did a fair work if it calculates small numbers, while if the number is extremenly large or it is a negative number, it is possible to reach 2^32 iteration for a result, in our experiment, it is very slow to calcute summation between two large positive number or addition including negative number. So we had to gave up this idea as well. But if anyone knows how to optimze this process, feel free to contact us!
+---
 
 ## V - Contribution
 
@@ -68,6 +90,8 @@ PIO is a good tool to work as a flexiable commmunication port such as UART, IIC 
 |Rongqian Chen|@WillChan9|Implemented curser moving, mouse left clicking, mouse right clicking functions.
 |Qi Xue|@sueqixue|Collected data for gesture recognization model, building the model from scartch (including the data processing, model structure tuning, and model training), and implemented model deploying function which connected the gesture recogniztion model with the system.
 |Junpeng Zhao|@PZZ97|Investigate tinyusb API, IMU data flitering algorithm, reconstruct code body to adapt to multifunctions, PIO application.
+
+---
 
 ## VI - Others:
 
@@ -79,7 +103,7 @@ PIO is a good tool to work as a flexiable commmunication port such as UART, IIC 
 |3D printed rings|2|
 |glove|1|
 
-### 6.2 Reference 
+### 6.3 Reference 
 [Arducam/pico-tfmicro/magic-wand-ble](https://github.com/ArduCAM/pico-tflmicro)
 
 Tinyusb 
