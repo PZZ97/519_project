@@ -4,8 +4,8 @@
 
 ## I - Overview
 ### 1.1 What is it?
-* We designed a mouse-keyboard system which have the curser moving, right clicking, left clicking, and gesture writing functions.
-* User can achive the curser function by rotating hand and can achived the clicking function by shaking fingers in the air. The keyboard function is under implementation.
+* We designed a mouse-keyboard system which have the cursor moving, right clicking, left clicking, and gesture writing functions.
+* User can achive the cursor function by rotating hand and can achived the clicking function by shaking fingers in the air. The keyboard function is under implementation.
 
 ### 1.2 How to use it?
 * **Cursor Movement:** There're two metal panels on these two rings. When you want to move the cursor, just hold these two fingers and let metal contact. The movment direction follows the direction of your palm. Relase fingers can stop moving cursor.
