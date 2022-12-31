@@ -78,7 +78,7 @@ PIO is a good tool to work as a flexiable commmunication port such as UART, IIC 
 
 |Member|Github Account|Contribution|
 |:--|:--|:--|
-|Rongqian Chen|@WillChan9|Implemented curser moving, mouse left clicking, mouse right clicking functions.
+|Rongqian Chen|@WillChan9|Implemented IMU data processing, mouse cursor movement computation and HID functions.
 |Qi Xue|@sueqixue|Collected data for gesture recognization model, building the model from scartch (including the data processing, model structure tuning, and model training), and implemented model deploying function which connected the gesture recogniztion model with the system.
 |Junpeng Zhao|@PZZ97|Investigate tinyusb API, IMU data flitering algorithm, reconstruct code body to adapt to multifunctions, PIO application.
 
